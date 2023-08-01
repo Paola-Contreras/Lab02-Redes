@@ -52,6 +52,15 @@ class Hamming {
                 }
             }
         }
+
+        int n = message.size();
+
+        for (int i = 0; i < n / 2; i++) {
+            String temp = message.get(i);
+            message.set(i, message.get(n - i - 1));
+            message.set(n - i - 1, temp);
+        }
+
         System.out.println(message);
         return message;
     }
@@ -84,6 +93,7 @@ class Hamming {
         
     public void paridad (List<List<Integer>> table,  String Data, List new_data){
         List<Integer> message = new ArrayList<>();
+        List<List<Integer>> temp_index = new ArrayList<>();
         List<Integer> temp = new ArrayList<>();
 
         for (int i = 0; i < Data.length(); i++) {
@@ -103,27 +113,73 @@ class Hamming {
                 k +=1;
             }
         }
-
+        // For para obtener los indices en donde hay 1 dentro de mi tabla 
         for (List<Integer> lista : table) {
-             temp = new ArrayList<>(); // Crear una nueva lista temp para cada sublista
+            temp = new ArrayList<>(); 
         
             for (int i = 0; i < lista.size(); i++) {
-                int valor = lista.get(i);
-                System.out.print(valor);
+                int valo = lista.get(i);
         
-                if (valor == 1) {
-                    temp.add(i); // Agregar el índice a la lista temp
+                if (valo== 1) {
+                    temp.add(i-1); 
+                }
+                 
+            }
+            temp_index.add(temp);
+        }
+        System.out.println( new_data);
+
+
+        for (List<Integer> lista_index : temp_index) {
+           List<Object> temp2 = new ArrayList<>(); 
+           new_data = new_data;
+            for (int i = 0; i < lista_index.size(); i++) {
+                int valor = lista_index.get(i);
+                Object message_text = new_data.get(valor);
+                temp2.add(message_text);
+                System.out.println(valor);
+            }
+            System.out.println(temp2);
+
+            int countZero = 0;
+            int countOne = 0;
+
+            for (Object obj : temp2) {
+                if (obj instanceof Integer) {
+                    int c = (int) obj;
+                    if (c == 0) {
+                        countZero++;
+                    } else if (c == 1) {
+                        countOne++;
+                    }
                 }
             }
         
-            System.out.println();
-            System.out.println(temp);
-            System.out.println();
+            // if (countZero % 2 == 0 && countOne %2 != 0){
+            //     int num = 1;
+            //     new_data.set(valor,num);
+            //     System.out.println("Cantidad de '0': " + countZero);
+            // } else if ( countOne % 2 == 0 && countZero == 3) {
+            //     int num = 0;
+            //     new_data.set(valor,num);
+
+            //     System.out.println("Cantidad de '1': " + countOne);
+            //     System.out.println("Cantidad de '1': " + countZero);
+            // }else if (countOne % 2 == 0 && countZero %2 != 0) {
+            //     int num = 0;
+            //     new_data.set(valor,num);
+
+            //     System.out.println("Cantidad : " + countOne);
+
+            // }
+
+            System.out.println( new_data);
         }
-
-
-        
+        System.out.println();
+        System.out.println(temp_index);
+        System.out.println();
         System.out.println( new_data);
+
 
     }
 
@@ -145,8 +201,3 @@ class Hamming {
         hamming.paridad(table,Data,new_data);
     }
 }
-
-/* 2^p >= p + i + 1 
- * donde p es el bit de paridad
- * donde i es la cantidad de bits 
-*/
