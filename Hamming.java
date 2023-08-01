@@ -61,7 +61,6 @@ class Hamming {
             message.set(n - i - 1, temp);
         }
 
-        System.out.println(message);
         return message;
     }
 
@@ -91,15 +90,12 @@ class Hamming {
         return tableList;
     }
         
-    public void paridad (List<List<Integer>> table,  String Data, List new_data){
+    public List message(String Data, List new_data){
         List<Integer> message = new ArrayList<>();
-        List<List<Integer>> temp_index = new ArrayList<>();
-        List<Integer> temp = new ArrayList<>();
-
         for (int i = 0; i < Data.length(); i++) {
-            char c = Data.charAt(i);
-            int text = Character.getNumericValue(c);
-            message.add(text);
+                    char c = Data.charAt(i);
+                    int text = Character.getNumericValue(c);
+                    message.add(text);
         }
         
         int k = 0;
@@ -111,39 +107,43 @@ class Hamming {
                 int val = message.get(k); 
                 new_data.set(j,val);
                 k +=1;
-            }
-        }
-        // For para obtener los indices en donde hay 1 dentro de mi tabla 
-        for (List<Integer> lista : table) {
-            temp = new ArrayList<>(); 
-        
-            for (int i = 0; i < lista.size(); i++) {
-                int valo = lista.get(i);
-        
-                if (valo== 1) {
-                    temp.add(i-1); 
-                }
-                 
-            }
-            temp_index.add(temp);
+            } 
         }
         System.out.println( new_data);
 
+        return new_data;
+    }
+    
+    public List position_ones (List<List<Integer>> table, List new_data){ 
+        List<List<Integer>> temp_index = new ArrayList<>();
+        List<Integer> temp = new ArrayList<>();
 
-        for (List<Integer> lista_index : temp_index) {
-           List<Object> temp2 = new ArrayList<>(); 
-           new_data = new_data;
-            for (int i = 0; i < lista_index.size(); i++) {
-                int valor = lista_index.get(i);
-                Object message_text = new_data.get(valor);
-                temp2.add(message_text);
-                System.out.println(valor);
+         for (List<Integer> lista : table) {
+            temp = new ArrayList<>(); 
+            for (int i = 0; i < lista.size(); i++) {
+                int val = lista.get(i);
+                if (val == 1) {
+                    temp.add(i-1); 
+                }
             }
-            System.out.println(temp2);
+            temp_index.add(temp);
+        }
 
+        return temp_index;
+    }
+    
+    public List paridad(List<List<Integer>> ones_pos, List<Object> new_data) {
+        for (List<Integer> lista : ones_pos) {
+            List<Object> temp2 = new ArrayList<>();
+            for (int i = 0; i < lista.size(); i++) {
+                int val = lista.get(i);
+                Object text = new_data.get(val);
+                temp2.add(text);
+            }
+    
             int countZero = 0;
             int countOne = 0;
-
+    
             for (Object obj : temp2) {
                 if (obj instanceof Integer) {
                     int c = (int) obj;
@@ -154,34 +154,43 @@ class Hamming {
                     }
                 }
             }
-        
-            // if (countZero % 2 == 0 && countOne %2 != 0){
-            //     int num = 1;
-            //     new_data.set(valor,num);
-            //     System.out.println("Cantidad de '0': " + countZero);
-            // } else if ( countOne % 2 == 0 && countZero == 3) {
-            //     int num = 0;
-            //     new_data.set(valor,num);
-
-            //     System.out.println("Cantidad de '1': " + countOne);
-            //     System.out.println("Cantidad de '1': " + countZero);
-            // }else if (countOne % 2 == 0 && countZero %2 != 0) {
-            //     int num = 0;
-            //     new_data.set(valor,num);
-
-            //     System.out.println("Cantidad : " + countOne);
-
-            // }
-
-            System.out.println( new_data);
+    
+            int num;
+            if (countOne % 2 == 0 && countZero % 2 != 0) {
+                num = 0;
+            } else if (countZero % 2 == 0 && countOne % 2 != 0) {
+                num = 1;
+            } else if (countZero  == 3 ) {
+                num = 0;
+            } else if (countOne  == 3 ) {
+                num = 1;
+            } else {
+                num = 0;
+            }
+    
+            // Find the index of 'x' in new_data for this specific sublist in ones_pos and replace it with the determined odd number
+            int xIndex = -1;
+            for (int i = 0; i < lista.size(); i++) {
+                int val = lista.get(i);
+                if (new_data.get(val).equals("x")) {
+                    xIndex = val;
+                    break;
+                }
+            }
+            if (xIndex != -1) {
+                new_data.set(xIndex, num);
+            }
+    
+            System.out.println("Temp2: " + temp2);
+            System.out.println("Updated new_data: " + new_data);
+    
+            countZero = 0;
+            countOne = 0;
         }
-        System.out.println();
-        System.out.println(temp_index);
-        System.out.println();
-        System.out.println( new_data);
 
-
+        return new_data;
     }
+    
 
     public static void main(String args[]) {
         Scanner myObj = new Scanner(System.in);
@@ -197,7 +206,10 @@ class Hamming {
         List p_num = hamming.position(i,p);
         List new_data = hamming.Message_data(p_num,i,p);
         List table = hamming.true_table(p_num,i,p);
-
-        hamming.paridad(table,Data,new_data);
+        List message = hamming.message(Data,new_data);
+        List one_index = hamming.position_ones(table,new_data);
+        List finish_message = hamming.paridad(one_index,new_data);
     }
 }
+
+// 1001100
