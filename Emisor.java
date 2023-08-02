@@ -149,6 +149,8 @@ class Emisor {
     
     public List paridad(List<List<Integer>> ones_pos, List<Object> new_data) {
         //System.out.println( new_data);
+        List<Object> par_list = new ArrayList<>();
+
         for (List<Integer> lista : ones_pos) {
             List<Object> temp2 = new ArrayList<>();
             for (int i = 0; i < lista.size(); i++) {
@@ -193,6 +195,9 @@ class Emisor {
                     break;
                 }
             }
+            // System.out.println("NUM: " +num);
+            par_list.add(num);
+
             if (xIndex != -1) {
                 new_data.set(xIndex, num);
             }
@@ -204,7 +209,14 @@ class Emisor {
             countOne = 0;
         }
 
-        return new_data;
+    List<List<Object>> result = new ArrayList<>();
+    result.add(new_data);
+    result.add(par_list);
+
+    List<Object> Final_result = new ArrayList<>();
+    Final_result.add(result);
+
+    return Final_result;
     }
 
     public String convertirString(List<List<Object>> listaDeListas) {
