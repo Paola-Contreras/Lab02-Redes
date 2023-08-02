@@ -3,27 +3,21 @@ import java.util.ArrayList;
 
 class Hamming {
 
-    public static String convertirString(List<List<Object>> listaDeListas) {
-        StringBuilder builder = new StringBuilder();
-
-        for (List<Object> lista : listaDeListas) {
-            for (Object valor : lista) {
-                builder.append(valor.toString());
-            }
-            builder.append(" ");
-        }
-
-        return builder.toString().trim();
-    }
-
     public static void main(String args[]) {
+        Emisor emisor = new Emisor();
+        Receptor receptor = new Receptor();
+        
         Scanner myObj = new Scanner(System.in);
         System.out.println("\nIngrese mensaje: ");
 
         String Data = myObj.nextLine();
-        System.out.println("-> La data ingresada es: " + Data);
 
         List<List<Object>> temp = new ArrayList<>();
+        List<Integer> missing =  new ArrayList<>();
+        String resultado = "";
+        String resultado_mod = "";
+        List<List<Integer>> one_index = new ArrayList<>();
+  
 
         if (Data.length() % 4 != 0) {
             int elementosFaltantes = 4 - (Data.length() % 4);
@@ -44,21 +38,28 @@ class Hamming {
             String segment = Data.substring(j, endIndex);
             int i = segment.length();
 
-            Emisor emisor = new Emisor();
+            
     
-            int p = emisor.function(i);
+            int  p = emisor.function(i);
             List p_num = emisor.position(i,p);
             List new_data = emisor.Message_data(p_num,i,p);
-            List table = emisor.true_table(p_num,i,p);
             List message = emisor.message(segment,new_data);
-            List one_index = emisor.position_ones(table,new_data);
+                 missing = emisor.missingIndex(new_data);
+            List table = emisor.true_table(p_num,i,p);
+                 one_index = emisor.position_ones(table,new_data);
             List finish_message = emisor.paridad(one_index,new_data);
             temp.add(finish_message);
+           
+            
         }
 
-        Hamming main = new Hamming();
-        String resultado = main.convertirString(temp);
+        resultado = emisor.convertirString(temp);
+        System.out.println("-> La data ingresada es: " + Data);
         System.out.println("-> La data codificada es: " + resultado);
+        System.out.println(missing);
+        resultado_mod = "1001100";
+
+        receptor.paridado(one_index,missing,resultado_mod);
 
     }
 }

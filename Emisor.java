@@ -60,7 +60,7 @@ class Emisor {
             message.set(i, message.get(n - i - 1));
             message.set(n - i - 1, temp);
         }
-
+        // System.out.println( message);
         return message;
     }
 
@@ -90,27 +90,43 @@ class Emisor {
         return tableList;
     }
         
-    public List message(String Data, List new_data){
+    public List message(String data, List new_data){
         List<Integer> message = new ArrayList<>();
-        for (int i = 0; i < Data.length(); i++) {
-                    char c = Data.charAt(i);
-                    int text = Character.getNumericValue(c);
-                    message.add(text);
+        for (int i = 0; i < data.length(); i++) {
+            char c = data.charAt(i);
+            int text = Character.getNumericValue(c);
+            message.add(text);
         }
         
         int k = 0;
-        for (int j=new_data.size() - 1; j >= 0; j--){
+        for (int j = 0; j < new_data.size(); j++) {
             Object old_val = new_data.get(j);
             
-            if (old_val == "o"){ 
-            
-                int val = message.get(k); 
-                new_data.set(j,val);
-                k +=1;
-            } 
+            if (old_val.equals("o")) { // Cambiar la comparación a equals
+    
+                int val = message.get(k); // Obtener el valor correspondiente de message
+                new_data.set(j, val);
+                k += 1;
+            }
         }
-        // System.out.println( new_data);
-        return new_data;
+        
+        // System.out.println(new_data);
+        // System.out.println(message);
+        return (List<Integer>) new_data;
+    }
+
+    public List missingIndex(List new_data){
+        List<Integer> messageIndex = new ArrayList<>();
+        for (int k =0; k<new_data.size();k++){
+            Object value = new_data.get(k);
+
+            if (value.equals("x")){
+                messageIndex.add(k);
+            }
+        }
+       // System.out.println( messageIndex);
+       return messageIndex;
+        
     }
     
     public List position_ones (List<List<Integer>> table, List new_data){ 
@@ -132,6 +148,7 @@ class Emisor {
     }
     
     public List paridad(List<List<Integer>> ones_pos, List<Object> new_data) {
+        //System.out.println( new_data);
         for (List<Integer> lista : ones_pos) {
             List<Object> temp2 = new ArrayList<>();
             for (int i = 0; i < lista.size(); i++) {
@@ -188,6 +205,19 @@ class Emisor {
         }
 
         return new_data;
+    }
+
+    public String convertirString(List<List<Object>> listaDeListas) {
+        StringBuilder builder = new StringBuilder();
+
+        for (List<Object> lista : listaDeListas) {
+            for (Object valor : lista) {
+                builder.append(valor.toString());
+            }
+            builder.append(" ");
+        }
+
+        return builder.toString().trim();
     }
 }
 
