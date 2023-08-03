@@ -2,6 +2,10 @@ import java.util.*;
 import java.util.ArrayList;
 
 class Emisor {
+    private List<Object> par_list = new ArrayList<>();
+
+    public Emisor(){
+    }
     public int function(int length_data) {
         List<Integer> possible = new ArrayList<>();
         boolean verify = true;
@@ -115,20 +119,6 @@ class Emisor {
         return (List<Integer>) new_data;
     }
 
-    public List missingIndex(List new_data){
-        List<Integer> messageIndex = new ArrayList<>();
-        for (int k =0; k<new_data.size();k++){
-            Object value = new_data.get(k);
-
-            if (value.equals("x")){
-                messageIndex.add(k);
-            }
-        }
-       // System.out.println( messageIndex);
-       return messageIndex;
-        
-    }
-    
     public List position_ones (List<List<Integer>> table, List new_data){ 
         List<List<Integer>> temp_index = new ArrayList<>();
         List<Integer> temp = new ArrayList<>();
@@ -149,7 +139,7 @@ class Emisor {
     
     public List paridad(List<List<Integer>> ones_pos, List<Object> new_data) {
         //System.out.println( new_data);
-        List<Object> par_list = new ArrayList<>();
+        List<Object> par_list1 = new ArrayList<>();
 
         for (List<Integer> lista : ones_pos) {
             List<Object> temp2 = new ArrayList<>();
@@ -196,7 +186,7 @@ class Emisor {
                 }
             }
             // System.out.println("NUM: " +num);
-            par_list.add(num);
+            par_list1.add(num);
 
             if (xIndex != -1) {
                 new_data.set(xIndex, num);
@@ -209,14 +199,15 @@ class Emisor {
             countOne = 0;
         }
 
-    List<List<Object>> result = new ArrayList<>();
-    result.add(new_data);
-    result.add(par_list);
+        par_list = par_list1;
+        // List<List<Object>> result = new ArrayList<>();
+        // result.add(new_data);
+        // result.add(par_list);
 
-    List<Object> Final_result = new ArrayList<>();
-    Final_result.add(result);
+        // List<Object> Final_result = new ArrayList<>();
+        // Final_result.add(result);
 
-    return Final_result;
+        return new_data;
     }
 
     public String convertirString(List<List<Object>> listaDeListas) {
@@ -226,10 +217,14 @@ class Emisor {
             for (Object valor : lista) {
                 builder.append(valor.toString());
             }
-            builder.append(" ");
+            builder.append("");
         }
 
         return builder.toString().trim();
+    }
+
+    public List<Object> getParList() {
+        return par_list;
     }
 }
 
