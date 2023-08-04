@@ -5,16 +5,27 @@ Redes
 - Paola Contreras 20213
 - Paola De León 20361
 
----
+
 ## How to Run
 ---
-
-### Emisor Algoritmo CRC-32
+### **Algoritmo CRC-32**
+- Emisor
 ```
     cd CRC32/
-    python3 emisor.py
+    python emisor.py
 ```
-### Receptor Algoritmo CRC-32
+- Receptor 
 ```
     node receptor.js
+```
+
+### **Algoritmo Hamming**
+- Emisor 
+```
+    javac Hamming.java -> compilar 
+    java hamming -> correr
+```
+- Receptor
+```
+     python Receptor.py
 ```
