@@ -10,8 +10,11 @@ Redes
 
 ## Algoritmo Hamming
 ```
-    # Emisor 
-    javac Hamming.java - compilar 
-    java hamming - correr
+    - Emisor 
+    javac Hamming.java -> compilar 
+    java hamming -> correr
+
+    - Receptor
+     python Receptor.py
     
 ```
