@@ -55,7 +55,7 @@ def createFile(content:str):
 
 
 if __name__ == "__main__":
-    trama = "11011011"
+    trama = "1001100"
     print('\nTrama ingresada:', trama)
     trama = convertToList(trama)
     res = crc32(trama)
