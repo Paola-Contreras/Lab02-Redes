@@ -21,6 +21,7 @@ const allZeros = (binaryCode) => {
 
 
 const crc32 = (binaryCode) => {
+
     // Polinomio generador
     const polynomial = [1, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 1, 1];
     const padding = polynomial.length - 1;
@@ -34,7 +35,7 @@ const crc32 = (binaryCode) => {
         }
     }
 
-    allZeros(binaryCode) === true ? console.log('Mensaje sin errores.') : console.log('@! Hay errores en el mensaje.');
+    return allZeros(binaryCode)
 
 }
 
@@ -45,7 +46,9 @@ fs.readFile('CRC32_msg.txt', 'utf8', (err, data) => {
         console.error('Error reading the file:', err);
     } else {
         const binaryCode = Array.from(data).map(Number);
-        crc32(binaryCode);
+        const res = crc32(binaryCode);
+        console.log(res)
+        res === true ? console.log('Mensaje sin errores. \n > Trama: ', data.slice(0, -32)) : console.log('@! Hay errores en el mensaje, por lo tanto se descarta.');
     }
 
 });
