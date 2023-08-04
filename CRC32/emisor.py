@@ -55,10 +55,11 @@ def createFile(content:str):
 
 
 if __name__ == "__main__":
-    trama = "1011101010"
-    print('Trama ingresada:', trama)
+    trama = "11011011"
+    print('\nTrama ingresada:', trama)
     trama = convertToList(trama)
     res = crc32(trama)
     tramaRes = ''.join(map(str, res))
     createFile(tramaRes)
-    print("Resultado de CRC-32:", len(tramaRes))
+    print("Resultado de CRC-32:\n", tramaRes)
+    print()

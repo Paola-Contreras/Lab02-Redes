@@ -47,8 +47,7 @@ fs.readFile('CRC32_msg.txt', 'utf8', (err, data) => {
     } else {
         const binaryCode = Array.from(data).map(Number);
         const res = crc32(binaryCode);
-        console.log(res)
-        res === true ? console.log('Mensaje sin errores. \n > Trama: ', data.slice(0, -32)) : console.log('@! Hay errores en el mensaje, por lo tanto se descarta.');
+        res === true ? console.log('Mensaje sin errores. \n > Trama: ', data.slice(0, -32)) : console.log('@! Hay errores en el mensaje,\n   por lo tanto se descarta.');
     }
 
 });
