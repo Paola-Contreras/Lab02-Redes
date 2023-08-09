@@ -4,10 +4,21 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
-class Hamming {
+import java.net.Socket;
+import java.net.InetAddress;
 
-    public static void main(String args[]) {
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.OutputStreamWriter;
+import java.net.UnknownHostException;
+
+class Hamming {
+    private static String	HOST = "192.168.1.5";
+	private static int	PORT = 65432;
+
+    public static void main(String args[]) throws IOException, UnknownHostException, InterruptedException {
         Emisor emisor = new Emisor();
+        Conversor conversor = new Conversor();
         
         String resultado = "";
         String resultado_mod = "";
@@ -21,16 +32,28 @@ class Hamming {
         System.out.println("\nIngrese mensaje: ");
         String Data = myObj.nextLine();
 
-        if (Data.length() % 4 != 0) {
-            int elementosFaltantes = 4 - (Data.length() % 4);
-            StringBuilder builder = new StringBuilder(Data);
-            for (int l = 0; l < elementosFaltantes; l++) {
-                builder.append("0");
+
+        StringBuilder asciiBinary = new StringBuilder();
+        for (int i = 0; i < Data.length(); i++) {
+            char caracter = Data.charAt(i);
+            int valorAscii = (int) caracter;
+            String valorBinario = conversor.convertirABinario(valorAscii);
+            
+            asciiBinary.append(valorBinario).append("");
         }
         
-        Data = builder.toString();
-        } 
+        Data = asciiBinary.toString();
 
+        if (Data.length() % 4 != 0) {
+            int elementosFaltantes = 4 - (Data.length() % 4);
+            // System.out.println("Elementos faltantes: " + elementosFaltantes);
+            String ceros = "0".repeat(elementosFaltantes);
+    
+            // Concatenar los ceros a la izquierda de Data
+            Data = ceros + Data;
+            // System.out.println("Datos con ceros agregados: " + Data); 
+        }
+  
         int segmentLength = 4;
         for (int j = 0; j < Data.length(); j += segmentLength) {
             int endIndex = Math.min(j + segmentLength, Data.length());
@@ -52,18 +75,39 @@ class Hamming {
            
             
         }
+
         resultado = emisor.convertirString(temp);
         System.out.println("-> La data ingresada es: " + Data);
         System.out.println("-> La data codificada es: " + resultado);
 
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("HammingEmisor.txt"))) {
-            // Escribir las variables en el archivo
-            writer.write("Mensaje_emisor: " + resultado);
-            writer.newLine();  // Agregar una nueva línea
-            writer.write("Indices: " + one_index);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
+        OutputStreamWriter writer = null;
+        ObjectInputStream ois = null;
+        System.out.println("Emisor Java Sockets\n");
+
+        //crear socket/conexion
+        Socket socketCliente = new Socket( InetAddress.getByName(HOST), PORT);
+
+        //mandar data 
+        System.out.println("Enviando Data\n");
+        writer = new OutputStreamWriter(socketCliente.getOutputStream());
+        String payload = resultado;
+        writer.write(payload);	//enviar payload
+        Thread.sleep(100);
+
+        //limpieza
+        System.out.println("Liberando Sockets\n");
+        writer.close();
+        socketCliente.close();
+
+        // try (BufferedWriter writer = new BufferedWriter(new FileWriter("HammingEmisor.txt"))) {
+        //     // Escribir las variables en el archivo
+        //     writer.write("Mensaje_emisor: " + resultado);
+        //     writer.newLine();  // Agregar una nueva línea
+        //     writer.write("Indices: " + one_index);
+        // } catch (IOException e) {
+        //     e.printStackTrace();
+        // }
 
     }
 }
