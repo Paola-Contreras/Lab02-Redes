@@ -100,14 +100,5 @@ class Hamming {
         writer.close();
         socketCliente.close();
 
-        // try (BufferedWriter writer = new BufferedWriter(new FileWriter("HammingEmisor.txt"))) {
-        //     // Escribir las variables en el archivo
-        //     writer.write("Mensaje_emisor: " + resultado);
-        //     writer.newLine();  // Agregar una nueva línea
-        //     writer.write("Indices: " + one_index);
-        // } catch (IOException e) {
-        //     e.printStackTrace();
-        // }
-
     }
 }

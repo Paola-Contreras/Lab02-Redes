@@ -1,4 +1,5 @@
 import socket
+import numpy as np
 
 def string_to_List(new_data):
     new_dataList = []
@@ -38,80 +39,86 @@ def paridad (one_index, data):
     #print(new_paridad)
     return new_paridad
 
-def get_variables(txt):
-    # Obtener los datos del emisor 
-    with open(f"{txt}.txt", "r") as archivo:
-        doc = archivo.readlines()
-
-    # Elimina los saltos de línea de cada línea y crea variables en base a ellas
-    for linea in doc:
-        nombre_variable, contenido = linea.strip().split(": ")
-        globals()[nombre_variable] = contenido
-    return Mensaje_emisor , Indices
+def introduce_noise(sequence):
+    error_rate = 0.1
+    noisy_sequence = []
+    for bit in sequence:
+        if np.random.random() < error_rate:
+            noisy_bit = '0' if bit == '1' else '1'
+            noisy_sequence.append(noisy_bit)
+        else:
+            noisy_sequence.append(bit)
+    return "".join(noisy_sequence)
 
 def get_correccion(data):
     data.reverse()
     cadena_invertida = ''.join(data)
     return cadena_invertida
 
-HOST = "192.168.1.5"  
-PORT = 65432       
+def conection():
+    HOST = "192.168.1.5"  
+    PORT = 65432       
+    Trama = ""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((HOST, PORT))
+        s.listen()
+    
+        conn, addr = s.accept()
+        with conn:
+            print(f"Conexion Entrante del proceso {addr}")
+            while True: #en caso se envien mas de 1024 bytes
+                #recibir 1024 bytes
+                data = conn.recv(1024)
+                if not data:
+                    break   #ya se recibio todo
+                print(f"Recibidoo: \n{data!s}")
+                print(data)
+                Trama = str(data)[2:-1]
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen()
-   
-    conn, addr = s.accept()
-    with conn:
-        print(f"Conexion Entrante del proceso {addr}")
-        while True: #en caso se envien mas de 1024 bytes
-            #recibir 1024 bytes
-            data = conn.recv(1024)
-            if not data:
-                break   #ya se recibio todo
-            print(f"Recibidoo: \n{data!r}\n{data!s}\n{data!a}") #!r !s !a, repr() str() ascii()
-            ##echo
-            #conn.sendall(data)
+    return Trama
+Trama = conection()
+noisy_sequence1 = introduce_noise(Trama)
+Indices = "[[0, 2, 4, 6], [1, 2, 5, 6], [3, 4, 5, 6]]"
+# Imprimir las secuencias originales y las ruidosas
+print("Secuencia original 1:", Trama)
+print("Secuencia ruidosa 1:", noisy_sequence1)
 
+new_data = noisy_sequence1
+one_index = eval(Indices)
 
-# Mensaje_emisor, Indices = get_variables("HammingEmisor")
-# print(f"\tPor favor, ingrese el nuevo mensaje cambiandole un bit a {Mensaje_emisor}")
-# print("**Nota: si este es mayor a 7 bits hacer un cambio dentro de un bloque de 7 caracteres**\n")
-# new_data = nuevos_datos = input("Ingrese mensaje: ")
-# #new_data = "10111001011100"
-# one_index = eval(Indices)
+segments = []
+right_message = []
 
-# segments = []
-# right_message = []
-# for i in range(0, len(new_data), 7):
-#     segmento = new_data[i:i+7]
-#     segments.append(segmento)
+# Recorre la new_data en pasos de 7 caracteres, empezando desde el final
+for i in range(len(new_data)-1, -1, -7):
+    start_index = max(i-6, 0) 
+    segmento = new_data[start_index:i+1]
+    segments.append(segmento)
 
+for segment in segments:
+    print("\n-> Actualmente se esta evaluando: ",segment)
+    data = string_to_List(segment)
+    newest_paridad = paridad(one_index, data)
+    if newest_paridad == [0, 0, 0] or new_data == Trama:
+        print('La cadena no cuenta con ningun error, o esta no ha sido modificada')
+    else:
+        num_bit = int(''.join(map(str, newest_paridad)))
+        num_decimal = int(str(num_bit), 2)
 
-# for segment in segments:
-#     print("\n-> Actualmente se esta evaluando: ",segment)
-#     data = string_to_List(segment)
-#     newest_paridad = paridad(one_index, data)
-#     if newest_paridad == [0, 0, 0] or new_data == Mensaje_emisor:
-#         print('La cadena no cuenta con ningun error, o esta no ha sido modificada')
-#     else:
-#         num_bit = int(''.join(map(str, newest_paridad)))
-#         num_decimal = int(str(num_bit), 2)
+        # print(newest_paridad)
+        # print(num_decimal)
 
-#         # print(newest_paridad)
-#         # print(num_decimal)
+        data_numDecimal = data[num_decimal-1]
+        print('-> El error se encuentra en la posición: ',num_decimal)
 
-#         data_numDecimal = data[num_decimal-1]
-#         print('-> El error se encuentra en la posición: ',num_decimal)
+        if data_numDecimal == "1":
+            data[num_decimal-1] = "0"
+        else:
+            data[num_decimal-1] = "1"
 
-#         if data_numDecimal == "1":
-#             data[num_decimal-1] = "0"
-#         else:
-#             data[num_decimal-1] = "1"
+        Fixed=get_correccion(data)
+        right_message.append(Fixed)
+        print("... Corrigiendo ...")
 
-#         Fixed=get_correccion(data)
-#         right_message.append(Fixed)
-#         print("... Corrigiendo ...")
-
-# done = resultado = ''.join(right_message)
-# print('\n-> El mensaje ha sido corregido, originalmente era: ', done)
+done = resultado = ''.join(right_message)
+print('\n-> El mensaje ha sido corregido, originalmente era: ', done)
