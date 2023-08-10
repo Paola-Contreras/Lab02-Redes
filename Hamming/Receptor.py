@@ -1,5 +1,6 @@
 import socket
 import numpy as np
+import matplotlib.pyplot as plt
 
 def string_to_List(new_data):
     new_dataList = []
@@ -40,6 +41,7 @@ def paridad (one_index, data):
     return new_paridad
 
 def introduce_noise(sequence):
+    # print(sequence)
     error_rate = 0.05
     noisy_sequence = []
     for bit in sequence:
@@ -138,58 +140,151 @@ def get_trama(segments):
 
 
 Trama = conection()
-noisy_sequence1 = introduce_noise(Trama)
-Indices = "[[0, 2, 4, 6], [1, 2, 5, 6], [3, 4, 5, 6]]"
 
-# Imprimir las secuencias originales y las ruidosas
-# print("Trama Original:", Trama)
-print("Receptor recibio:", noisy_sequence1)
-original_trama = get_org(Trama)
-new_data = noisy_sequence1
-one_index = eval(Indices)
+if '-' not in Trama:
+    noisy_sequence1 = introduce_noise(Trama)
+    Indices = "[[0, 2, 4, 6], [1, 2, 5, 6], [3, 4, 5, 6]]"
 
-segments = []
-right_message = []
+    # Imprimir las secuencias originales y las ruidosas
+    # print("Trama Original:", Trama)
+    print("Receptor recibio:", noisy_sequence1)
+    original_trama = get_org(Trama)
+    new_data = noisy_sequence1
+    one_index = eval(Indices)
 
-# Recorre la new_data en pasos de 7 caracteres, empezando desde el final
-for i in range(len(new_data)-1, -1, -7):
-    start_index = max(i-6, 0) 
-    segmento = new_data[start_index:i+1]
-    segments.append(segmento)
+    segments = []
+    right_message = []
 
-for segment in segments:
-    print("\n-> Actualmente se esta evaluando: ",segment)
-    data = string_to_List(segment)
-    newest_paridad = paridad(one_index, data)
-    if newest_paridad == [0, 0, 0] or new_data == Trama:
-        print('La cadena no cuenta con ningun error')
-        right_message.append(segment)
-    else:
-        num_bit = int(''.join(map(str, newest_paridad)))
-        num_decimal = int(str(num_bit), 2)
+    # Recorre la new_data en pasos de 7 caracteres, empezando desde el final
+    for i in range(len(new_data)-1, -1, -7):
+        start_index = max(i-6, 0) 
+        segmento = new_data[start_index:i+1]
+        segments.append(segmento)
 
-        # print(newest_paridad)
-        # print(num_decimal)
-
-        data_numDecimal = data[num_decimal-1]
-        print('-> El error se encuentra en la posición: ',num_decimal)
-
-        if data_numDecimal == "1":
-            data[num_decimal-1] = "0"
+    for segment in segments:
+        print("\n-> Actualmente se esta evaluando: ",segment)
+        data = string_to_List(segment)
+        newest_paridad = paridad(one_index, data)
+        if newest_paridad == [0, 0, 0] or new_data == Trama:
+            print('La cadena no cuenta con ningun error')
+            right_message.append(segment)
         else:
-            data[num_decimal-1] = "1"
+            num_bit = int(''.join(map(str, newest_paridad)))
+            num_decimal = int(str(num_bit), 2)
 
-        Fixed=get_correccion(data)
-        right_message.append(Fixed)
-        print("... Corrigiendo ...")
+            # print(newest_paridad)
+            # print(num_decimal)
 
-done = get_trama(right_message)        
+            data_numDecimal = data[num_decimal-1]
+            print('-> El error se encuentra en la posición: ',num_decimal)
 
-if done == original_trama:
-    print('\n------- RESULTADO -------')
-    print('-> Mensaje obtendio : ',done )
+            if data_numDecimal == "1":
+                data[num_decimal-1] = "0"
+            else:
+                data[num_decimal-1] = "1"
+
+            Fixed=get_correccion(data)
+            right_message.append(Fixed)
+            print("... Corrigiendo ...")
+
+    done = get_trama(right_message)        
+
+    if done == original_trama:
+        print('\n------- RESULTADO -------')
+        print('-> Mensaje obtendio : ',done )
+    else:
+        print('\n------- RESULTADO -------')
+        print('-> Mensaje obtendio : ',done )
+        print("** El mensaje no se ha podido corregir **")
 else:
-    print('\n------- RESULTADO -------')
-    print('-> Mensaje obtendio : ',done )
-    print("** El mensaje no se ha podido corregir **")
+    listOrg = []
+    listRes = []
 
+    lineas = Trama.split('-')
+    Indices = "[[0, 2, 4, 6], [1, 2, 5, 6], [3, 4, 5, 6]]"
+    lineas = [item for item in lineas if item != '']
+    # print(lineas)
+    for combination in lineas:
+        # print(combination)
+        noisy_sequence1 = introduce_noise(combination)
+        print("Receptor recibio:", noisy_sequence1)
+        original_trama = get_org(combination)
+        # print(original_trama)
+        listOrg.append(original_trama)
+        new_data = noisy_sequence1
+        one_index = eval(Indices)
+
+        segments = []
+        right_message = []
+
+        # Recorre la new_data en pasos de 7 caracteres, empezando desde el final
+        for i in range(len(new_data)-1, -1, -7):
+            start_index = max(i-6, 0) 
+            segmento = new_data[start_index:i+1]
+            segments.append(segmento)
+
+        for segment in segments:
+            print("\n-> Actualmente se esta evaluando: ",segment)
+            data = string_to_List(segment)
+            newest_paridad = paridad(one_index, data)
+            if newest_paridad == [0, 0, 0] or new_data == Trama:
+                print('La cadena no cuenta con ningun error')
+                right_message.append(segment)
+            else:
+                num_bit = int(''.join(map(str, newest_paridad)))
+                num_decimal = int(str(num_bit), 2)
+
+                # print(newest_paridad)
+                # print(num_decimal)
+
+                data_numDecimal = data[num_decimal-1]
+                print('-> El error se encuentra en la posición: ',num_decimal)
+
+                if data_numDecimal == "1":
+                    data[num_decimal-1] = "0"
+                else:
+                    data[num_decimal-1] = "1"
+
+                Fixed=get_correccion(data)
+                right_message.append(Fixed)
+                print("... Corrigiendo ...")
+
+        done = get_trama(right_message)        
+
+        if done == original_trama:
+            print('\n------- RESULTADO -------')
+            print('-> Mensaje obtendio : ',done, '\n')
+            listRes.append(done)
+        else:
+            print('\n------- RESULTADO -------')
+            print('-> Mensaje obtendio : ',done )
+            print("** El mensaje no se ha podido corregir correctamente **\n")
+            listRes.append(done)
+    iguales = 0
+    diferentes = 0
+    print('----------- RESULTADOS SIMULACION -----------')
+    for elemento1, elemento2 in zip(listOrg, listRes):
+        if elemento1 == elemento2:
+            print(f"Los elementos '{elemento1}' y '{elemento2}' son iguales.")
+            iguales += 1
+        else:
+            print(f"Los elementos '{elemento1}' y '{elemento2}' son diferentes.")
+            diferentes += 1
+
+    # Imprimir resultados
+    
+    print(f"Número de elementos iguales: {iguales}")
+    print(f"Número de elementos diferentes: {diferentes}")
+    # Etiquetas para las porciones del gráfico
+
+    etiquetas = ['Correctas', 'Incorrectas']
+    valores = [iguales, diferentes]
+
+    # Colores de las porciones
+    colores = ['gray', 'pink']
+
+    plt.pie(valores, labels=etiquetas, colors=colores, autopct='%1.1f%%', startangle=140)
+    plt.title('Resultados Hamming simulacion con 10,000 tramas')
+
+    plt.axis('equal')  # Para asegurar que la gráfica sea circular
+    plt.show()
