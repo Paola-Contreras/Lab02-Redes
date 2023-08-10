@@ -40,7 +40,7 @@ def paridad (one_index, data):
     return new_paridad
 
 def introduce_noise(sequence):
-    error_rate = 0.1
+    error_rate = 0.05
     noisy_sequence = []
     for bit in sequence:
         if np.random.random() < error_rate:
@@ -65,24 +65,86 @@ def conection():
     
         conn, addr = s.accept()
         with conn:
-            print(f"Conexion Entrante del proceso {addr}")
+            print(f"Conexion Entrante del proceso {addr}\n")
             while True: #en caso se envien mas de 1024 bytes
                 #recibir 1024 bytes
                 data = conn.recv(1024)
                 if not data:
                     break   #ya se recibio todo
-                print(f"Recibidoo: \n{data!s}")
-                print(data)
+                # print(f"Recibidoo: \n{data!s}")
+                # print(data)
                 Trama = str(data)[2:-1]
 
     return Trama
+
+def get_org (binary_string):
+    # print(binary_string)
+    segments = [binary_string[max(i-7, 0):i] for i in range(len(binary_string), 0, -7)]
+    # print(segments)
+    get_bit = []
+    word = []
+    for segment in segments:
+        # print(segment)
+        new_seg = list(segment)
+        new_seg.pop(6)
+        new_seg.pop(5)
+        new_seg.pop(3)
+        # print(new_seg)
+        new_bit = ''.join(new_seg)
+        get_bit.append(new_bit)
+    # print(get_bit)
+    get_bits = ''.join(reversed(get_bit))
+    # print(get_bits)
+
+    segment_length = 8
+    for i in range(0, len(get_bits), segment_length):
+        Eigth_bits = get_bits[i:i+segment_length]
+        # print("Segmento:", Eigth_bits)
+        decimal = int(str(Eigth_bits), 2)
+        ascii_character = chr(decimal)
+        # print(ascii_character,'hh')
+        word.append(ascii_character)
+    F_word =''.join(word)
+    # print(F_word)
+    return F_word
+
+def get_trama(segments): 
+    get_bit = []
+    word = []
+    for segment in segments:
+        #print(segment)
+        new_seg = list(segment)
+        new_seg.pop(6)
+        new_seg.pop(5)
+        new_seg.pop(3)
+        # print(new_seg)
+        new_bit = ''.join(new_seg)
+        get_bit.append(new_bit)
+    # print(get_bit)
+    get_bits = ''.join(reversed(get_bit))
+    # print(get_bits)
+
+    segment_length = 8
+    for i in range(0, len(get_bits), segment_length):
+        Eigth_bits = get_bits[i:i+segment_length]
+        #print("Segmento:", Eigth_bits)
+        decimal = int(str(Eigth_bits), 2)
+        ascii_character = chr(decimal)
+        # print(ascii_character,'hh')
+        word.append(ascii_character)
+    F_word =''.join(word)
+    print(F_word)
+    return F_word
+
+
 Trama = conection()
 noisy_sequence1 = introduce_noise(Trama)
 Indices = "[[0, 2, 4, 6], [1, 2, 5, 6], [3, 4, 5, 6]]"
-# Imprimir las secuencias originales y las ruidosas
-print("Secuencia original 1:", Trama)
-print("Secuencia ruidosa 1:", noisy_sequence1)
 
+# Imprimir las secuencias originales y las ruidosas
+# print("Trama Original:", Trama)
+print("Receptor recibio:", noisy_sequence1)
+original_trama = get_org(Trama)
 new_data = noisy_sequence1
 one_index = eval(Indices)
 
@@ -100,7 +162,8 @@ for segment in segments:
     data = string_to_List(segment)
     newest_paridad = paridad(one_index, data)
     if newest_paridad == [0, 0, 0] or new_data == Trama:
-        print('La cadena no cuenta con ningun error, o esta no ha sido modificada')
+        print('La cadena no cuenta con ningun error')
+        right_message.append(segment)
     else:
         num_bit = int(''.join(map(str, newest_paridad)))
         num_decimal = int(str(num_bit), 2)
@@ -120,5 +183,13 @@ for segment in segments:
         right_message.append(Fixed)
         print("... Corrigiendo ...")
 
-done = resultado = ''.join(right_message)
-print('\n-> El mensaje ha sido corregido, originalmente era: ', done)
+done = get_trama(right_message)        
+
+if done == original_trama:
+    print('\n------- RESULTADO -------')
+    print('-> Mensaje obtendio : ',done )
+else:
+    print('\n------- RESULTADO -------')
+    print('-> Mensaje obtendio : ',done )
+    print("** El mensaje no se ha podido corregir **")
+
