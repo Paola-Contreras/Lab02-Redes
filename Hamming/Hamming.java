@@ -20,29 +20,25 @@ import java.net.UnknownHostException;
 
 
 public class Hamming {
-    public void conect(String HOST, int	PORT, String doc) {
+    public void conect(String HOST, int	PORT, String doc)throws IOException, UnknownHostException, InterruptedException {
+        OutputStreamWriter writer = null;
+        ObjectInputStream ois = null;
         System.out.println("\n * Emisor Java Sockets *");
-        try {
-            Socket socket = new Socket(InetAddress.getByName(HOST), PORT); // Dirección IP y puerto del servidor
-            File fileToSend = new File(doc); // Ruta del archivo a enviar
-            FileInputStream fileInputStream = new FileInputStream(fileToSend);
-            System.out.println("- Enviando Data");
-            OutputStream outputStream = socket.getOutputStream();
 
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
+        //crear socket/conexion
+        Socket socketCliente = new Socket( InetAddress.getByName(HOST), PORT);
 
-            System.out.println("- Documento enviado.");
-            System.out.println("* Liberando Sockets *");
-            outputStream.close();
-            fileInputStream.close();
-            socket.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        //mandar data 
+        System.out.println("- Enviando Data");
+        writer = new OutputStreamWriter(socketCliente.getOutputStream());
+        String payload = doc;
+        writer.write(payload);	//enviar payload
+        Thread.sleep(100);
+
+        //limpieza
+        System.out.println("* Liberando Sockets *");
+        writer.close();
+        socketCliente.close();
     }
 
     public void option2(String	HOST,  int	PORT) throws IOException, UnknownHostException, InterruptedException{
@@ -140,7 +136,7 @@ public class Hamming {
         socketCliente.close();
     }
 
-    public void option1(String Words){
+    public String option1(String Words){
         Emisor emisor = new Emisor();
         Conversor conversor = new Conversor();
 
@@ -214,15 +210,6 @@ public class Hamming {
         System.out.println("-> La data ingresada es: " + Data);
         System.out.println("-> La data codificada es: " + resultado + "\n");
 
-        String rutaArchivo = "HammingEmisor.txt";
-        try (FileWriter fileWriter = new FileWriter(rutaArchivo, true)) {
-            // Escribir los resultados en el archivo
-            fileWriter.write("-" + resultado);
-    
-            // Cerrar el FileWriter automáticamente al finalizar
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    
+        return resultado;
     }
 }
