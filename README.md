@@ -9,14 +9,14 @@ Redes
 ## How to Run
 ---
 ### **Algoritmo CRC-32**
-- Emisor
-```
-    cd CRC32/
-    python emisor.py
-```
 - Receptor 
 ```
+    cd CRC32/
     node receptor.js
+```
+- Emisor
+```
+    python emisor.py
 ```
 
 ### **Algoritmo Hamming**
