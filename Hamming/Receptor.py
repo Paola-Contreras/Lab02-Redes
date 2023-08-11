@@ -1,3 +1,4 @@
+import sys
 import socket
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,6 +10,7 @@ def string_to_List(new_data):
     return new_dataList
 
 def paridad (one_index, data):
+    # print(data)
     new_paridad = []
 
     for i in one_index:
@@ -42,7 +44,15 @@ def paridad (one_index, data):
 
 def introduce_noise(sequence):
     # print(sequence)
-    error_rate = 0.05
+    if len(sequence)%7 != 0:
+        ceros_a_anadir = 7 - len(sequence)
+        cadena_con_zeros = '0' * ceros_a_anadir + sequence
+        sequence = cadena_con_zeros
+    else:
+        pass
+
+    print(sequence,"ddddd")
+    error_rate = 0.03
     noisy_sequence = []
     for bit in sequence:
         if np.random.random() < error_rate:
@@ -50,7 +60,8 @@ def introduce_noise(sequence):
             noisy_sequence.append(noisy_bit)
         else:
             noisy_sequence.append(bit)
-    return "".join(noisy_sequence)
+    noisy = "".join(noisy_sequence)
+    return noisy
 
 def get_correccion(data):
     data.reverse()
@@ -75,13 +86,22 @@ def conection():
                     break   #ya se recibio todo
                 # print(f"Recibidoo: \n{data!s}")
                 # print(data)
-                Trama = str(data)[2:-1]
-
+                Trama += str(data.decode("utf-8") )
+    # Trama = Trama[2:-1]
+    # Trama_decodificada = Trama
     return Trama
 
 def get_org (binary_string):
-    # print(binary_string)
-    segments = [binary_string[max(i-7, 0):i] for i in range(len(binary_string), 0, -7)]
+    # print(binary_string,"ww")
+    if len(binary_string)%7 != 0:
+        ceros_a_anadir = 7 - len(binary_string)
+        cadena_con_zeros = '0' * ceros_a_anadir + binary_string
+        binary_string = cadena_con_zeros
+    else:
+        pass
+    
+    segments = [binary_string[i-7:i] for i in range(len(binary_string), 0, -7)]
+    segments = [elemento for elemento in segments if elemento != '']
     # print(segments)
     get_bit = []
     word = []
@@ -111,6 +131,7 @@ def get_org (binary_string):
     return F_word
 
 def get_trama(segments): 
+    # print(segments)
     get_bit = []
     word = []
     for segment in segments:
@@ -138,13 +159,13 @@ def get_trama(segments):
     print(F_word)
     return F_word
 
-
+sys.stdout.reconfigure(encoding='utf-8')
 Trama = conection()
 
-if '-' not in Trama:
+# print(Trama)
+Indices = "[[0, 2, 4, 6], [1, 2, 5, 6], [3, 4, 5, 6]]"
+if ',' not in Trama:
     noisy_sequence1 = introduce_noise(Trama)
-    Indices = "[[0, 2, 4, 6], [1, 2, 5, 6], [3, 4, 5, 6]]"
-
     # Imprimir las secuencias originales y las ruidosas
     # print("Trama Original:", Trama)
     print("Receptor recibio:", noisy_sequence1)
@@ -199,10 +220,9 @@ if '-' not in Trama:
 else:
     listOrg = []
     listRes = []
-
-    lineas = Trama.split('-')
-    Indices = "[[0, 2, 4, 6], [1, 2, 5, 6], [3, 4, 5, 6]]"
+    lineas = Trama.split(',')
     lineas = [item for item in lineas if item != '']
+    print(len(lineas))
     # print(lineas)
     for combination in lineas:
         # print(combination)
@@ -222,8 +242,10 @@ else:
             start_index = max(i-6, 0) 
             segmento = new_data[start_index:i+1]
             segments.append(segmento)
-
-        for segment in segments:
+        Nsegments = [palabra for palabra in segments if palabra.strip() != '']
+        print(Nsegments)
+        Nsegments = [elemento for elemento in Nsegments if len(elemento) > 1]
+        for segment in Nsegments:
             print("\n-> Actualmente se esta evaluando: ",segment)
             data = string_to_List(segment)
             newest_paridad = paridad(one_index, data)
@@ -260,15 +282,17 @@ else:
             print('-> Mensaje obtendio : ',done )
             print("** El mensaje no se ha podido corregir correctamente **\n")
             listRes.append(done)
+    # print(listOrg)
+    # print(listRes)
     iguales = 0
     diferentes = 0
     print('----------- RESULTADOS SIMULACION -----------')
     for elemento1, elemento2 in zip(listOrg, listRes):
         if elemento1 == elemento2:
-            print(f"Los elementos '{elemento1}' y '{elemento2}' son iguales.")
+            # print(elemento1,elemento2)
             iguales += 1
         else:
-            print(f"Los elementos '{elemento1}' y '{elemento2}' son diferentes.")
+            # print(elemento1,elemento2)
             diferentes += 1
 
     # Imprimir resultados
@@ -281,10 +305,10 @@ else:
     valores = [iguales, diferentes]
 
     # Colores de las porciones
-    colores = ['gray', 'pink']
+    colores = ['orange', 'grey']
 
     plt.pie(valores, labels=etiquetas, colors=colores, autopct='%1.1f%%', startangle=140)
-    plt.title('Resultados Hamming simulacion con 10,000 tramas')
+    plt.title('Resultados Hamming Simulacion')
 
     plt.axis('equal')  # Para asegurar que la gráfica sea circular
     plt.show()

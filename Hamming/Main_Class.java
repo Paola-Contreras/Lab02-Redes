@@ -47,13 +47,19 @@ class Main_Class {
                     BufferedReader br = new BufferedReader(fr);
                     String Dato = "";
                     String linea;
+                    List<String> listaDeStrings = new ArrayList<>();
+
+                    // listaDeStrings.add("INICIO");
                     while ((linea = br.readLine()) != null) {
                         System.out.println("\n"+linea);
-                        hamming.option1(linea);
-
+                        String RR = hamming.option1(linea);
+                        listaDeStrings.add(RR);
                     }
-                    String  rutaArchivoF = "HammingEmisor.txt"; 
-                    hamming.conect(HOST,PORT,rutaArchivoF);
+                    // System.out.println(listaDeStrings.size());
+                    String cadenaConComas = String.join(", ", listaDeStrings);
+
+                    // System.out.println("Cadena con comas: " + cadenaConComas);
+                    hamming.conect(HOST,PORT,cadenaConComas);
                     System.exit(0);
 
                 case 2:

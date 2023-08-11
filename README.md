@@ -20,8 +20,6 @@ Redes
 ```
 
 ### **Algoritmo Hamming**
-**Nota**
-- Eliminar el contenido de HammingEmisor.txt antes de realizar una simulación
 
 - Emisor 
 ```
