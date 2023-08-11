@@ -11,7 +11,12 @@
 """
 
 
+import random
 import sys
+import socket
+
+HOST = "192.168.5.227"
+PORT = 3000
 
 def crc32(binaryCode: list[int]) -> list[int]:
     '''
@@ -53,13 +58,57 @@ def createFile(content:str):
         file.write(content)
 
 
+def binaryString(string):
+    binary_representation = ""
+    
+    for char in string:
+        ascii_value = ord(char)
+        binary_value = bin(ascii_value)[2:]
+        padding = 8 - len(binary_value)
+        binary_with_padding = '0' * padding + binary_value
+        
+        binary_representation += binary_with_padding
+    
+    return binary_representation
 
-if __name__ == "__main__":
-    trama = "1001100"
+
+def apply_noise(frame, probability):
+    noisy_frame = []
+    
+    for bit in frame:
+        if random.random() < probability:
+            noisy_bit = int(not bit)
+            print("RUIDO APLICADO")
+        else:
+            noisy_bit = bit
+        noisy_frame.append(noisy_bit)
+    
+    return noisy_frame
+
+
+def main():
+    print("Emisor Python Sockets\n")
+    
+    # Crear socket/conexión
+    socket_cliente = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    socket_cliente.connect((HOST, PORT))
+    
+    # Enviar data
+    probability = 0.01
+    string = input("Ingrese el mensaje a transmitir: ")
+    trama = binaryString(string)
     print('\nTrama ingresada:', trama)
+    trama = apply_noise(trama, probability)
     trama = convertToList(trama)
     res = crc32(trama)
     tramaRes = ''.join(map(str, res))
-    createFile(tramaRes)
     print("Resultado de CRC-32:\n", tramaRes)
     print()
+    socket_cliente.sendall(tramaRes.encode()) 
+    
+    # Limpieza
+    print("Liberando Sockets\n")
+    socket_cliente.close()
+
+if __name__ == "__main__":
+    main()
