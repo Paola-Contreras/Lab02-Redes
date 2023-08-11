@@ -20,10 +20,14 @@ Redes
 ```
 
 ### **Algoritmo Hamming**
+**Nota**
+- Eliminar el contenido de HammingEmisor.txt antes de realizar una simulación
+
 - Emisor 
 ```
-    javac Hamming.java -> compilar 
-    java hamming -> correr
+    cd Hamming
+    javac Main_Class.java -> compilar 
+    java Main_Class -> correr
 ```
 - Receptor
 ```
